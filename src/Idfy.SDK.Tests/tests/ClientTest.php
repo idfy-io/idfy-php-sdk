@@ -23,4 +23,8 @@ final class TestFrameworkTest extends TestCase
 		$tt = new TestType("");
 		$this->assertInstanceOf(TestType::class, $tt);
 	}
+
+	public function test_can_fail(){
+		$this->assertTrue(1 == 1);
+	}
 }
