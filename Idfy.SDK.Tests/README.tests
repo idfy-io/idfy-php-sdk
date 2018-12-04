@@ -1,0 +1,3 @@
+On an Ubuntu 18.04, the following packages are required to run tests:
+
+php7.2 php7.2-xml php7.2-mbstring composer 
