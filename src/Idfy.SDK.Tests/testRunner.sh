@@ -24,6 +24,18 @@ usage(){
 	printf "  -a\t --auto \t Run tests automaticaly when source files or tests change\n\n"
 }
 
+runloop(){
+	inotifywait -m -r -e create,modify,move,close_write $TEST_DIR $SOURCE_DIR --format "%f" \
+		| while read f ; do
+			if [[ "$f" =~ .*php$ ]]; then
+				break
+			fi
+		done
+	printf "$f changed! running tests \n"
+	run_all_tests
+	runloop
+}
+
 for args in "$@"; do
 	case $args in
 		-a | --auto)
@@ -36,20 +48,12 @@ for args in "$@"; do
 	esac
 done	
 
-if [ ! -x $PHPUNIT ]; then
+if [ ! -x "$PHPUNIT" ] ; then
 	composer install
 fi
 
-run_all_tests
-
-if [ $AUTO = true ] ; then
-	inotifywait -m -r -e create -e create,modify,move,close_write $TEST_DIR $SOURCE_DIR --format "%f" | while read f
-
-	do
-		if [[ "$f" =~ .*php$ ]]; then
-			printf "$f changed! running tests \n"
-			run_all_tests
-		fi
-	done
+if [ "$AUTO" = true ] ; then 
+	runloop
+else
+	run_all_tests
 fi
-
