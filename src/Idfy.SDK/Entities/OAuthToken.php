@@ -1,10 +1,6 @@
 <?php
 declare(strict_types=1);
 
-class BadAccessTokenException extends Exception {}
-class UnsupportedTokenTypeException extends Exception {}
-class BadExpiresInException extends Exception {}
-
 final class OAuthToken{
 
 	private $accessToken = "";
@@ -14,20 +10,23 @@ final class OAuthToken{
 
 	public function __construct($accessToken, $expiresIn, $tokenType, $tokenValidFrom = null){
 		if($tokenValidFrom == null){
-			$this->tokenValidFrom = new DateTimeImmutable(); /* This is quite shaky, should get from response headers instead. */
+			$this->tokenValidFrom = new DateTimeImmutable(); /* This is quite shaky, need to get it from response headers instead. */
 		} else {
 			$this->tokenValidFrom = $tokenValidFrom;
 		}
+
 		$this->setAccessToken($accessToken);
 		if(!is_numeric($expiresIn)){
 			throw new BadExpiresInException("Could not parse expires_in: ".$expiresIn.".");
 		}
+
 		if((int)$expiresIn < 1)
 			throw new BadExpiresInException("expires_in must be a positive integer. Got: ".$expiresIn.".");
 
 		$this->setExpiresIn((int)$expiresIn);
 		if($tokenType != "Bearer")
 			throw new UnsupportedTokenTypeException("Unsupported token type: ".$tokenType.". Only Bearer is supported for now.");
+
 		$this->$tokenType = "Bearer";
 	}
 

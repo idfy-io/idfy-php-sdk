@@ -3,8 +3,8 @@ declare(strict_types=1);
 
 use PHPUnit\Framework\TestCase;
 
-include '../Idfy.SDK/Entities/OAuthToken.php';
-include './tests/TestData.php';
+include_once '../Idfy.SDK/Entities/OAuthToken.php';
+include_once './tests/TestData.php';
 
 final class OAuthTokenTest extends TestCase
 {

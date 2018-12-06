@@ -25,7 +25,7 @@ usage(){
 }
 
 runloop(){
-	inotifywait -m -r -e create,modify,move,close_write $TEST_DIR $SOURCE_DIR --format "%f" \
+	inotifywait -mq -r -e create,modify,move,close_write $TEST_DIR $SOURCE_DIR --format "%f" \
 		| while read f ; do
 			if [[ "$f" =~ .*php$ ]]; then
 				break
@@ -53,6 +53,7 @@ if [ ! -x "$PHPUNIT" ] ; then
 fi
 
 if [ "$AUTO" = true ] ; then 
+	echo "Automatic test mode enabled. Waiting for changed files..."
 	runloop
 else
 	run_all_tests
