@@ -20,3 +20,10 @@ final class FakeNetworkService implements iNetworkService
 		return TestData::$access_token_response;
 	}
 }
+
+final class InvalidClientNetworkService implements iNetworkService
+{
+	public function PostFormData($resource, $formData, $headers = []) : string {
+		return json_encode(["error" => "invalid_client"]);
+	}
+}

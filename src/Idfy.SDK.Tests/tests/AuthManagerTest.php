@@ -45,12 +45,18 @@ final class AuthManagerTest extends TestCase
 
 	public function test_Authorize_throws_BadOAuthScopesEception_when_scopes_is_not_an_array(){
 		$this->expectException(BadOAuthScopesException::class);
-		$this->am::Authorize($this->valid_client_id, $this->valid_client_secret, "noarrayhere");
+		$this->am::Authorize("noarrayhere");
 	}
 
 	public function test_Authorize_throws_BadOAuthScopesException_when_scopes_is_empty(){
 		$this->expectException(BadOAuthScopesException::class);
-		$this->am::Authorize($this->valid_client_id, $this->valid_client_secret, []);
+		$this->am::Authorize([]);
+	}
+
+	public function test_Authorize_throws_AuthorizeFailedException_when_an_error_is_received_in_the_response(){
+		$this->expectException(AuthorizeFailedException::class);
+		$nm = new AuthManager("something", "something", new InvalidClientNetworkService());
+		$nm->Authorize($this->valid_scopes);
 	}
 
 }

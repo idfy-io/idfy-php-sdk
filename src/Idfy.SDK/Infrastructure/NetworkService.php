@@ -1,6 +1,5 @@
 <?php
 declare(strict_types=1);
-
 $dn = dirname(__FILE__)."/";
 include_once($dn.'Exceptions.php');
 include_once($dn.'iNetworkService.php');
@@ -24,22 +23,23 @@ final class NetworkService implements iNetworkService {
 		else{
 			$this->curl = $curl_init();
 		}
+}
+
+	public function PostFormData($resource, $formData, $headers = []) {
+		return $this->POST($resource, http_build_query($formData), $headers);
 	}
 
-	public function PostFormData($resource, $formData, $headers = []) : string {
-		return $this->POST($resource, http_build_query($formData));
-	}
-
-	private function POST($resource, $payload, $headers = []){
+	private function POST($resource, $payload, $headers){
 		$url = $this->baseUrl.$resource;
 		$heads=$headers+["Content-Type"=> "application/x-www-form-urlencoded; charset=utf-8", "Cache-Control" => "no-cache"];
 		$options = array(
 			CURLOPT_URL => $url,
+			CURLOPT_HTTPHEADER => $heads,
+			CURLOPT_POSTFIELDS => $payload,
 			CURLOPT_RETURNTRANSFER => true,
 			CURLOPT_POST => true,
-			CURLOPT_POSTFIELDS => $payload,
 			CURLOPT_SSL_VERIFYHOST => false,
-			CURLOPT_VERBOSE => true
+			CURLOPT_VERBOSE => false
 		);
 		curl_setopt_array($this->curl, $options);
 		$result = curl_exec($this->curl);

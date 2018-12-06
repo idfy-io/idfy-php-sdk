@@ -12,6 +12,7 @@ class BadClientIdException extends Exception {}
 class BadClientSecretException extends Exception {}
 class BadOAuthScopesException extends Exception {}
 class MissingNetworkServiceException extends Exception {}
+class AuthorizeFailedException extends Exception {}
 
 /* Infrastructure/NetworkService */
 class MissingBaseUrlException extends Exception {}

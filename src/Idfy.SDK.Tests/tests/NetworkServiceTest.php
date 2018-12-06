@@ -19,14 +19,14 @@ final class NetworkServiceTest extends TestCase
 		$dn = dirname(__FILE__)."/";
 		$secrets = $dn.'.secret/Secrets.php';
 		if(file_exists($secrets)){
-			printf("\n.Found secrets in ".$secrets.".\n");
+			if(isset($DEBUG)){printf("\n.Found secrets in ".$secrets.".\n");}
 			include_once($secrets);
 			$this->s_id = Secrets::$client_id;
 			$this->s_sec = Secrets::$client_secret;
 			$this->got_secrets = true;
 		} else {
 			$this->got_secrets = false;
-		printf("\nNo secrets found in ".$secrets.".\n");
+		if(isset($DEBUG)){printf("\nNo secrets found in ".$secrets.".\n");}
 	}
 
 	$this->ns = new NetworkService();
@@ -46,6 +46,8 @@ final class NetworkServiceTest extends TestCase
 		$nw = new NetworkService("this\"is>not<a%well|formed@url");
 	}
 
+	/* TODO: Integration tests should go elsewhere */
+
 	public function test_a_POST_request_returns_a_valid_json_response(){
 		$cid = TestData::$client_id;	/*needs more work for integration testing*/
 		$csr = TestData::$client_secret;
@@ -57,12 +59,20 @@ final class NetworkServiceTest extends TestCase
 		$body = array("grant_type" => "client_credentials", "scope" => "document_read", "client_id" => $cid, "client_secret" => $csr);
 		$result = $this->ns->PostFormData("oauth/connect/token", $body);
 		$decoded_result = json_decode($result, true);
-		$this->assertTrue(is_array($decoded_result));	
+		$this->assertArrayHasKey("access_token", $decoded_result);	
+		$this->assertArrayHasKey("expires_in", $decoded_result);	
+		$this->assertArraySubset(["token_type" => "Bearer"], $decoded_result);
 	}
 
-	/* Integration tests should go elsewhere */
 	public function test_an_Authorize_request_returns_an_OAuthToken(){
-		$this->assertTrue(false);
+		if($this->got_secrets == false) {
+			return; /* Integration against the actual service requires auth */
+		}
+
+		$nm = new NetworkService();
+		$as = new AuthManager($this->s_id, $this->s_sec, $nm);
+		$token = $as->Authorize(["document_read"]);
+		$this->assertInstanceOf(OAuthToken::class, $token);
 	}
 
 }
