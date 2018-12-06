@@ -49,4 +49,5 @@ class TestData {
 		.'Kyy3U4War33wcyEDRXJyoMF2SrcgqPWuna9GeTYxv70RkE0lOv21Effb_k4dAxW7ZZ0s4YhyHnC81FG'
 		.'Kl1xr46A","expires_in":3600,"token_type":"Bearer"}';
 
+	public static $valid_base_url = "https://api.idfy.io";
 }
