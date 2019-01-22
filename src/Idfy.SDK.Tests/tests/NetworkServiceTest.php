@@ -10,7 +10,7 @@ include_once './tests/TestData.php';
 final class NetworkServiceTest extends TestCase
 {
 	protected function setUp(){
-		$this->ns = new NetworkService();
+		$this->ns = new NetworkService("https://some.base.url.io");
 	}
 
 	public function test_has_NetworkService_type(){

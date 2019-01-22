@@ -3,15 +3,18 @@ declare(strict_types=1);
 $dn = dirname(__FILE__)."/";
 include_once($dn.'Infrastructure/Exceptions.php');
 include_once($dn.'OAuthScope.php');
+include_once($dn.'Infrastructure/Urls.php');
 
 final class IdfyConfiguration
 {
+	private const SDK_VERSION = '0.0.1 Alpha1';
 	private static $ClientId;
 	private static $ClientSecret;
 	private static $Scopes;
 	private static $Token;
-	private static $DefaultBaseUrl = "http://api.idfy.io/";
-	private static $DefaultOAuthUrl = "http://api.idfy.io/oauth/connect/token";
+	private static $BaseUrl;
+	private static $OAuthBaseUrl;
+	private static $HttpTimeoutSeconds = 0;
 
 	public function __construct(){
 		throw new Exception("IdfyConfiguration only allows static invocation");
@@ -46,6 +49,40 @@ final class IdfyConfiguration
 
 	public static function GetScopes(){
 		return self::$Scopes;
+	}
+
+	public static function GetSdkVersion(){
+		return self::SDK_VERSION;
+	}
+
+	public static function GetBaseUrl(){
+		if(!empty(self::$BaseUrl)){
+			return self::$BaseUrl;
+		}
+		return Urls::DefaultBaseUrl;
+	}
+
+	public static function SetBaseUrl($url){
+		self::$BaseUrl = $url;
+	}
+
+	public static function GetOAuthBaseUrl(){
+		if(!empty(self::$OAuthBaseUrl)){
+			return self::$OAuthBaseUrl;
+		}
+		return Urls::DefaultOAuthBaseUrl;
+	}
+
+	public static function SetOAuthBaseUrl($url){
+		self::$OAuthBaseUrl = $url;
+	}
+
+	public static function GetHttpTimeout(){
+		return self::$HttpTimeoutSeconds;
+	}
+
+	public static function SetHttpTimeout($secondsToTimeout){
+		self::$HttpTimeoutSeconds = $secondsToTimeout;
 	}
 	
 }

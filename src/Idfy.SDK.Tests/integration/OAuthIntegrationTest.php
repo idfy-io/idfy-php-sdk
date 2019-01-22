@@ -29,20 +29,12 @@ final class OAuthIntegrationTest extends TestCase
 			if(isset($DEBUG)){printf("\nNo secrets found in ".$secrets.".\n");}
 		}
 
-		$this->ns = new NetworkService();
+		$this->ns = new NetworkService(IdfyConfiguration::GetBaseUrl());
 	}
 
 
-
-	public function test_a_POST_request_returns_a_valid_json_response(){
-		$cid = TestData::$client_id;	/*needs more work for integration testing*/
-		$csr = TestData::$client_secret;
-		if($this->got_secrets == true) {
-			$cid = $this->s_id;
-			$csr = $this->s_sec;
-			$csr = Secrets::$client_secret;
-		}
-		$body = array("grant_type" => "client_credentials", "scope" => "document_read", "client_id" => $cid, "client_secret" => $csr);
+	public function test_can_exchange_a_valid_key_and_secret_for_an_access_token(){
+		$body = array("grant_type" => "client_credentials", "scope" => "document_read", "client_id" => $this->s_id, "client_secret" => $this->s_sec);
 		$result = $this->ns->PostFormData("oauth/connect/token", $body);
 		$decoded_result = json_decode($result, true);
 		$this->assertArrayHasKey("access_token", $decoded_result);	
@@ -52,10 +44,10 @@ final class OAuthIntegrationTest extends TestCase
 
 	public function test_an_Authorize_request_returns_an_OAuthToken(){
 		if($this->got_secrets == false) {
-			return; /* Integration against the actual service requires auth */
+			throw new Exception("Must set client id and secret in .secret/Secrets.php to run integration tests.");
 		}
 
-		$nm = new NetworkService();
+		$nm = new NetworkService(IdfyConfiguration::GetOAuthBaseUrl());
 		$as = new AuthManager($this->s_id, $this->s_sec, $nm);
 		$token = $as->Authorize(["document_read"]);
 		$this->assertInstanceOf(OAuthToken::class, $token);

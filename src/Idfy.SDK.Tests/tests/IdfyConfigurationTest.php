@@ -20,6 +20,12 @@ final class IdfyConfigurationTest extends TestCase
 		$this->validScope =[OAS::AccountRead(), OAS::AccountWrite()];
 	}
 
+	protected function tearDown(){
+		IdfyConfiguration::SetBaseUrl("");
+		IdfyConfiguration::SetOAuthBaseUrl("");
+		IdfyConfiguration::SetHttpTimeout(0);
+	}
+
 	public function invalidStrings()
 	{
 		return array(
@@ -102,6 +108,58 @@ final class IdfyConfigurationTest extends TestCase
 	public function test_can_set_oauth_scopes($validScope){
 		IdfyConfiguration::SetClientCredentials("id", "secret", $validScope);
 		$this->assertEquals($validScope, IdfyConfiguration::GetScopes());
+	}
+
+	public function test_can_get_SDK_version(){
+		$version = IdfyConfiguration::GetSdkVersion();
+		$regex = '/\d+.\d+.\d+\s\w+/';
+		$result = preg_match($regex, $version);
+		$this->assertEquals(1, $result);
+	}
+
+	public function test_baseurl_has_default_value(){
+		$expected = "https://api.idfy.io";
+		$actual = IdfyConfiguration::GetBaseUrl();
+		$this->assertEquals($expected, $actual);
+	}
+
+	public function test_can_set_custom_base_url(){
+		$expected = "https://some.random.url.io";
+		IdfyConfiguration::SetBaseUrl($expected);
+		$actual = IdfyConfiguration::GetBaseUrl();
+		$this->assertEquals($expected, $actual);
+	}
+
+	public function test_can_set_custom_oauth_base_url(){
+		$expected = "https://oauth.here.io";
+		IdfyConfiguration::SetOAuthBaseUrl($expected);
+		$actual = IdfyConfiguration::GetOAuthBaseUrl();
+		$this->assertEquals($expected, $actual);
+	}
+
+	public function test_changing_the_base_url_does_not_change_oauth_base_url(){
+		IdfyConfiguration::SetBaseUrl("https://some.random.url.io");
+		$actual = IdfyConfiguration::GetOAuthBaseUrl();
+		$expected = "https://api.idfy.io";
+		$this->assertEquals($expected, $actual);
+	}
+
+	public function test_changing_the_oauth_base_url_does_not_change_base_url(){
+		IdfyConfiguration::SetOAuthBaseUrl("https://some.random.url.io");
+		$actual = IdfyConfiguration::GetBaseUrl();
+		$expected = "https://api.idfy.io";
+		$this->assertEquals($expected, $actual);
+	}
+
+	public function test_can_get_the_default_http_timeout(){
+		$actual = IdfyConfiguration::GetHttpTimeout();
+		$this->assertEquals(0, $actual);
+	}
+
+	public function test_can_set_the_http_timeout(){
+		IdfyConfiguration::SetHttpTimeout(60);
+		$actual = IdfyConfiguration::GetHttpTimeout();
+		$this->assertEquals(60, $actual);
 	}
 
 }

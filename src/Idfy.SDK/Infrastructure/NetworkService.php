@@ -3,13 +3,14 @@ declare(strict_types=1);
 $dn = dirname(__FILE__)."/";
 include_once($dn.'Exceptions.php');
 include_once($dn.'iNetworkService.php');
+include_once($dn.'../IdfyConfiguration.php');
 
 final class NetworkService implements iNetworkService {
 
 	protected $baseUrl;
 	protected $curl;
 
-	public function __construct($baseUrl="https://api.idfy.io", $curl_init=null){	/*TODO: Wrap curl in a class of its own to allow clean abstraction and mocking */
+	public function __construct($baseUrl, $curl_init=null){	/*TODO: Wrap curl in a class of its own to allow clean abstraction and mocking */
 		if(empty($baseUrl)){
 			throw new MissingBaseUrlException("Baseurl parameter empty");
 		}
@@ -30,6 +31,7 @@ final class NetworkService implements iNetworkService {
 	}
 
 	private function POST($resource, $payload, $headers){
+		$timeout = IdfyConfiguration::GetHttpTimeout();
 		$url = $this->baseUrl.$resource;
 		$heads=$headers+["Content-Type"=> "application/x-www-form-urlencoded; charset=utf-8", "Cache-Control" => "no-cache"];
 		$options = array(
@@ -39,7 +41,8 @@ final class NetworkService implements iNetworkService {
 			CURLOPT_RETURNTRANSFER => true,
 			CURLOPT_POST => true,
 			CURLOPT_SSL_VERIFYHOST => false,
-			CURLOPT_VERBOSE => false
+			CURLOPT_VERBOSE => false,
+			CURLOPT_TIMEOUT => $timeout
 		);
 		curl_setopt_array($this->curl, $options);
 		$result = curl_exec($this->curl);
